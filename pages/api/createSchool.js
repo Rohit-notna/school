@@ -9,9 +9,9 @@ export default async function handler(req, res) {
         '${formData.address}',
         '${formData.city}',
         '${formData.state}',
-        '${formData.contact_number}',
+        '${formData.contactnumber}',
         '${formData.image}',
-        '${formData.email_id}'
+        '${formData.email}'
       );
     `;
     

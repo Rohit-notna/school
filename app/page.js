@@ -6,6 +6,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import axios from 'axios';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { app } from '../firebase/firebase';
+import { Icon } from '@iconify/react';
+
 
 export default function Page() {
   const fileRef = useRef(null);
@@ -23,7 +25,7 @@ export default function Page() {
     address: yup.string().min(4).max(60).required('Address Field Is Empty'),
   });
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset} = useForm({
     resolver: yupResolver(schema),
     mode: 'all',
   });
@@ -65,15 +67,26 @@ export default function Page() {
       const response = await axios.post("http://localhost:3000/api/createSchool", data);
       const responseData = response.data;
       console.log(responseData);
+      alert("School created successfully")
+      reset()
+      setImageUrl(null)
     } catch (error) {
+      alert("School submission fail")
       console.log(error);
+
     }
   };
   
   return (
+    <div>
+   <div>
+    <div className='mr-auto text-right'>
+     <a href="/fetch" className='mr-auto bg-gray-800 text-white px-3 py-2 rounded-lg'>Show All Schools</a>
+   </div>
+   </div>
     <div className='border-4 pt-1 w-8/12 mx-auto md:w-5/12 md:mx-auto lg:w-5/12 lg:mx-auto mt-10 px-6'>
     <form onSubmit={handleSubmit(onSubmit)} >
-      <p className='text-2xl text-center'>School List</p>
+      <p className='text-2xl text-center'>Add School</p>
       <input type="text" placeholder="name" name="name" {...register("name", { min: 2})} className='w-full py-2 mt-2 border rounded-lg pl-2'/>
       <p  className=' h-3 mb-2 text-red-700'>{errors.name?.message}</p>
 
@@ -101,16 +114,18 @@ export default function Page() {
         onChange={(e) => setFile(e.target.files[0])}
         type='file'
         ref={fileRef}
-        hidden
+        
         accept='image/*'
-        className='mt-20 w-6/12'
+        className='mt-1 mb-4 w-6/12'
       />
-      <img
+      {imageUrl && (<img
         onClick={() => fileRef.current.click()}
         src={imageUrl || (file && URL.createObjectURL(file))}
+        // src={imageUrl || <Icon icon="ic:baseline-upload" />}
         alt='profile'
         className='w-6/12'
-      />
+      />)}
+      
       <p className='text-sm self-center'>
         {fileUploadError ? (
           <span className='text-red-700'>
@@ -118,7 +133,7 @@ export default function Page() {
           </span>
         ) : filePerc > 0 && filePerc < 100 ? (
           <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
-        ) : filePerc === 100 ? (
+        ) : filePerc === 100 && imageUrl ? (
           <span className='text-green-700'>
             Image successfully uploaded!
           </span>
@@ -129,6 +144,8 @@ export default function Page() {
 
       <input type="submit" className='w-full border mb-2 rounded-md py-2 bg-red-900 text-white ' />
     </form>
+  
+    </div>
     </div>
   );
 }
