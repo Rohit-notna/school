@@ -1,7 +1,8 @@
+'use client'
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export default function FetchData() {
+export default function Page() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -10,15 +11,14 @@ export default function FetchData() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/api/submitForm");
+        const response = await axios.get("http://localhost:3000/api/schools");
         const responseData = response.data;
 
         if (responseData.success === false) {
           setError(true);
         } else {
-          setData(responseData); // Assuming your response is an array of data
+          setData(responseData.products); 
         }
-
         setLoading(false);
       } catch (error) {
         setError(true);
@@ -37,12 +37,12 @@ export default function FetchData() {
             <thead>
               <tr>
                 <th>Index</th>
-                <th>Name</th>
+                <th>School Name</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Contact Number</th>
                 <th>Email</th>
-                <th>Gender</th>
-                <th>Language</th>
-                <th>Password</th>
-                <th>StrongPassword</th>
               </tr>
             </thead>
             <tbody>
@@ -55,21 +55,11 @@ export default function FetchData() {
                   <td>{user.state}</td>
                   <td>{user.contactnumber}</td>
                   <td>{user.email}</td>
+                  <td>{user.image}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          {loading && <p className='text-center my-7 text-2xl'>Loading...</p>}
-          {error && <p className='text-center my-7 text-2xl'>Something went wrong!</p>}
-        </div>
-      </div>
-
-      <div className="container-fluid">
-        <div className="col-md-12 text-center">
-          <button style={{ textAlign: 'center' }} className='border px-2 py-1 bg-black text-white w-1/12 rounded-lg' onClick={HandleData}>
-            Add
-          </button>
         </div>
       </div>
     </div>

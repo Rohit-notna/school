@@ -15,12 +15,12 @@ export default function Page() {
   const [imageUrl, setImageUrl] = useState(undefined);
 
   const schema = yup.object().shape({
-    name: yup.string().min(4).max(15).required('Name Field Is Empty'),
+    name: yup.string().min(4).max(30).required('Name Field Is Empty'),
     email: yup.string().email().required('Email Field Is Empty'),
     contactnumber: yup.string().min(10).required('Number Field Is Empty'),
     state: yup.string().min(4).max(15).required('State Field Is Empty'),
     city: yup.string().min(4).max(15).required('City Field Is Empty'),
-    address: yup.string().min(4).max(15).required('Address Field Is Empty'),
+    address: yup.string().min(4).max(60).required('Address Field Is Empty'),
   });
 
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -39,7 +39,7 @@ export default function Page() {
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, file);
-
+  
     uploadTask.on(
       'state_changed',
       (snapshot) => {
@@ -52,21 +52,19 @@ export default function Page() {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log(downloadURL);
-          setImageUrl({downloadURL});
+          setImageUrl(downloadURL);
         });
       }
     );
   };
 
-
   const onSubmit = async (e) => {
-    // e.preventDefault()
     try {
-      const data = {...e, "image" : imageUrl.downloadURL};
+      const data = {...e, "image" : imageUrl};
       console.log(data);
-      // const response = await axios.post("http://localhost:3000/api/createSchool", data);
-      // const responseData = response.data;
-      // console.log(responseData);
+      const response = await axios.post("http://localhost:3000/api/createSchool", data);
+      const responseData = response.data;
+      console.log(responseData);
     } catch (error) {
       console.log(error);
     }
@@ -99,23 +97,35 @@ export default function Page() {
       <p className='h-3 mb-2 text-red-700'>{errors.email?.message}</p>
 
 
-      <input onChange={(e) => setFile(e.target.files[0])} type='file' ref={fileRef} hidden accept='image/*' className='mt-20 w-6/12' />
-        <img onClick={() => fileRef.current.click()} src={imageUrl || (file && URL.createObjectURL(file))} alt='profile' className='w-6/12' />
-        <p className='text-sm self-center'>
-          {fileUploadError ? (
-            <span className='text-red-700'>
-              Error Image upload (image must be less than 2 mb)
-            </span>
-          ) : filePerc > 0 && filePerc < 100 ? (
-            <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
-          ) : filePerc === 100 ? (
-            <span className='text-green-700'>
-              Image successfully uploaded!
-            </span>
-          ) : (
-            ''
-          )}
-        </p>
+      <input
+        onChange={(e) => setFile(e.target.files[0])}
+        type='file'
+        ref={fileRef}
+        hidden
+        accept='image/*'
+        className='mt-20 w-6/12'
+      />
+      <img
+        onClick={() => fileRef.current.click()}
+        src={imageUrl || (file && URL.createObjectURL(file))}
+        alt='profile'
+        className='w-6/12'
+      />
+      <p className='text-sm self-center'>
+        {fileUploadError ? (
+          <span className='text-red-700'>
+            Error Image upload (image must be less than 2 mb)
+          </span>
+        ) : filePerc > 0 && filePerc < 100 ? (
+          <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
+        ) : filePerc === 100 ? (
+          <span className='text-green-700'>
+            Image successfully uploaded!
+          </span>
+        ) : (
+          ''
+        )}
+      </p>
 
       <input type="submit" className='w-full border mb-2 rounded-md py-2 bg-red-900 text-white ' />
     </form>
